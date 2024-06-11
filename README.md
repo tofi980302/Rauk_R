@@ -1,3 +1,3 @@
 Thats a readme file,
 
-Author: Tobias
+Author: Tobias Fietze
