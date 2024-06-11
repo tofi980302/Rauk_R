@@ -14,8 +14,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 x <- 5
 
-
-gitcreds::gitcreds_set()
-usethis::use_github()
+#so we have now a second function
+new <- function(x) {
+  x = 2
+}
 ```
 
