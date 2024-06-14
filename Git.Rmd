@@ -20,3 +20,8 @@ new <- function(x) {
 }
 ```
 
+```{r}
+library(tidyverse)
+help.search("^geom_",package="ggplot2")
+```
+
