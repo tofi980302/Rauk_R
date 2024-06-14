@@ -1,0 +1,173 @@
+---
+title: "Day 4"
+output: html_document
+date: "2024-06-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(repurrrsive)
+library(gapminder)
+library(tidyverse)
+
+gapminder %>%
+ group_by(continent) %>%
+ summarize(max_minus_min = max(lifeExp) - min(lifeExp))
+
+
+child <- c("Reed", "Wesley", "Eli", "Toby")
+age <- c( 20, 18, 18, 7)
+paste(child, "is", age, "years old")
+
+help(package = "repurrrsive")
+
+str(got_chars)
+View(got_chars)
+str(got_chars, list.len = 4, max.level = 1)
+
+str(got_chars[[9]], list.len = 4)
+
+
+#Task how many aliases does each got char have?
+asha <- got_chars[[13]]
+asha[["aliases"]]
+
+theon <- got_chars[[1]]
+theon[["titles"]]
+
+got_chars[[19]]
+
+map_int(got_chars, \(x) length(x[["aliases"]]))
+map(got_chars, \(x) length(x[["titles"]]))
+map(got_chars, \(x) length(x[["tvSeries"]]))
+
+map_chr(got_chars, \(x) x[["name"]])
+
+map_chr(sw_people, \(x) x[["mass"]])
+
+sw_people[[1]][["mass"]]
+
+sw_people %>%  
+  map_chr(\(x) x[["mass"]]) %>% 
+  parse_number(na = "unknown")
+
+
+map(got_chars, "titles")
+
+map_chr(got_chars, "name")
+map_chr(got_chars, 3)
+
+
+View(sw_vehicles)
+sw_vehicles %>% 
+  map_chr(list("pilots", 1), .default = NA)
+
+
+map_chr(got_chars, "name")
+#> [1] "Theon Greyjoy" "Tyrion Lannister" "Victarion Greyjoy"
+#> ...
+got_chars_named <- set_names(got_chars, map_chr(got_chars, "name"))
+got_chars_named |>
+ map_lgl("alive")
+
+allegiances <- map(got_chars_named, "allegiances")
+tibble::enframe(allegiances, value = "allegiances")
+
+
+got_chars %>% 
+  transpose() %>% 
+  enframe() %>% 
+  rowwise() %>% 
+  mutate(lengths = list(lengths(value)),
+    min_len = min(lengths),
+    max_len = max(lengths)
+  ) |>
+  select(name, ends_with("_len"))
+
+#titles is one which is not the same
+
+got_chars %>% 
+   map_chr(list("titles", 1), .default =NA)
+
+got_chars_named %>% 
+  map_chr(list("povBooks", 1)) %>% enframe()
+
+
+# Which GoT character has the most allegiances? Aliases? Titles? 
+got_chars_named %>% 
+  map("allegiances") %>% 
+  map_int(length) %>% 
+  sort(decreasing = T) %>% 
+  enframe()
+
+got_chars_named %>% 
+  map("aliases") %>% 
+  map_int(length) %>% 
+  sort(decreasing = T) %>% 
+  enframe()
+
+got_chars_named %>% 
+  map("titles") %>% 
+  map_int(length) %>% 
+  sort(decreasing = T) %>% 
+  enframe()
+
+
+
+# Which SW film has the most characters?
+View(sw_films)
+sw_films |>
+  set_names(map_chr(sw_films, "title")) |>
+  map("characters") |>
+  map_int(length) |>
+  sort(decreasing = TRUE) |>
+  _[1]
+
+# Which SW species has the most possible eye colors?
+View(sw_species)
+sw_species |>
+  set_names(map_chr(sw_species, "name")) |>
+  map("eye_colors") |>
+  discard(\(x) x %in% c("unknown", "n/a")) |> #for every element in the list, discard this element, other alternative is to use keep
+  map(\(x) str_split_1(x, ",\\s*")) |> # split them up agian at this regular expression
+  map_int(length) |>
+  sort(decreasing = TRUE) |>
+  _[1]
+
+# Which GoT character has been played by multiple actors?
+got_chars_named |>
+  map("playedBy") |>
+  keep(\(x) length(x) > 1) #here she use keep
+
+# Smush together all of the books/povBooks for each character
+got_chars_named |>
+  map("titles") |>
+  map(\(x) str_flatten_comma(x)) |> # paste them together with comma
+  map_chr(\(x) if (x == "") "-none-" else x) |>
+  enframe()
+
+got_chars[[9]][["titles"]][[4]]
+pluck(got_chars, 9, "titles", 4)
+idx <- list(9, "titles", 4)
+pluck(got_chars, !!!idx)
+
+
+
+countries <- c("Argentina", "Brazil", "Canada")
+gap_small <- gapminder %>% 
+ filter(country %in% countries, year > 1996)
+gap_small
+
+write_one <- function(x) {
+ filename <- paste0(x, ".csv")
+ dataset <- filter(gap_small, country = x)
+ write_csv(dataset, filename)
+}
+
+walk(countries, write_one)
+list.files(pattern = "*.csv")
+```
+

@@ -1,0 +1,32 @@
+---
+title: "raukR shiny"
+runtime: shiny
+output: html_document
+date: "2024-06-13"
+---
+
+```{r}
+library(shiny)
+```
+
+This is a standard RMarkdown document. Here is some code:
+
+```{r}
+head(iris)
+```
+
+```{r}
+plot(iris$Sepal.Length,iris$Petal.Width)
+```
+
+But, here is an interactive shiny widget.
+
+```{r}
+sliderInput("in_breaks",label="Breaks:",min=5,max=50,value=5,step=5)
+```
+
+```{r}
+renderPlot({{
+hist(iris$Sepal.Length,breaks=input$in_breaks)
+}})
+```
